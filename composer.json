@@ -1,7 +1,7 @@
 {
-    "name": "mongator/silex",
+    "name": "yunait/level3-silex",
     "type": "library",
-    "description": "Provider to use Mongator with Silex framework",
+    "description": "Provider to use Level3 with Silex framework",
     "license": "MIT",
     "authors": [
         {
@@ -12,20 +12,15 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.0",
-        "mongator/mongator": "dev-master",
-        "symfony/console": "2.1.*"
-    },
-    "suggest": {
-        "ext-yaml": "Needed to reaad class configs in YAML files",
-        "cilex/console-service-provider": "Needed if you want to use console commands, useful to generate the classes and indexes"
+        "yunait/level3": "dev-master"
     },
     "require-dev": {
-        "cilex/console-service-provider": "1.0.*@dev",
+        "mockery/mockery": "*",
         "silex/silex": "1.0.*@dev"
     },
     "autoload": {
         "psr-0": {
-            "Mongator\\Silex": "src/"
+            "Level3\\Silex": "src/"
         }
     }
 }

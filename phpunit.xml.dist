@@ -2,14 +2,14 @@
 
 <phpunit bootstrap="tests/bootstrap.php" colors="true">
     <testsuites>
-        <testsuite name="Mongator/Silex Test Suite">
-            <directory>tests/Mongator/</directory>
+        <testsuite name="Level3/Silex Test Suite">
+            <directory>tests/Level3/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory suffix=".php">src/Mongator/</directory>
+            <directory suffix=".php">src/Level3/</directory>
         </whitelist>
     </filter>
 </phpunit>

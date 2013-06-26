@@ -1,4 +1,4 @@
-Mongator Silex Provider [![Build Status](https://travis-ci.org/mongator/silex.png?branch=master)](https://travis-ci.org/mongator/silex)
+Mongator Level3 Provider [![Build Status](https://travis-ci.org/mongator/silex.png?branch=master)](https://travis-ci.org/mongator/silex)
 ==============================
 
 Provider for using Mongator with Silex framework
@@ -9,8 +9,7 @@ Requirements
 
 * PHP 5.3.x
 * Unix system
-* silex/silex
-* mongator/mongator
+* yunait/level3
 
 Installation
 ------------
