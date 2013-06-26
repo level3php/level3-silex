@@ -88,6 +88,7 @@ class Level3ServiceProvider implements ServiceProviderInterface {
     }
 
     public function boot(Application $app) {
+        $app['level3.repository_loader']->registerRepositories();
         $app['level3.repository_mapper']->boot();
     }
 }
