@@ -32,7 +32,8 @@ class Level3ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.response_factory']  = $app->share(function(Application $app) {
             return new ResponseFactory(
-                $app['level3.resource_factory']
+                $app['level3.resource_factory'],
+                $app['level3.formatter_factory']
             );
         });
 
@@ -46,8 +47,7 @@ class Level3ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.accessor'] = $app->share(function(Application $app) {
             return new Accessor(
-                $app['level3.repository_hub'],
-                $app['level3.response_factory']
+                $app['level3.repository_hub']
             );
         });
 
@@ -55,7 +55,6 @@ class Level3ServiceProvider implements ServiceProviderInterface {
             return new AccessorWrapper(
                 $app['level3.accessor'],
                 $app['level3.response_factory'],
-                $app['level3.formatter_factory'],
                 $app['level3.parser_factory']
             );
         });
