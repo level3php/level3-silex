@@ -9,6 +9,8 @@
  */
 
 namespace Level3\Silex;
+use Level3\Hal\Formatter\FormatterFactory;
+use Level3\Hal\ResourceFactory;
 use Silex\ServiceProviderInterface;
 use Silex\Application;
 
@@ -29,7 +31,10 @@ class Level3ServiceProvider implements ServiceProviderInterface {
         });
 
         $app['level3.response_factory']  = $app->share(function(Application $app) {
-            return new ResponseFactory();
+            return new ResponseFactory(
+                $app['level3.resource_factory'],
+                $app['level3.formatter_factory']
+            );
         });
 
         $app['level3.resquest_factory']  = $app->share(function(Application $app) {
@@ -42,8 +47,7 @@ class Level3ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.accessor'] = $app->share(function(Application $app) {
             return new Accessor(
-                $app['level3.repository_hub'],
-                $app['level3.response_factory']
+                $app['level3.repository_hub']
             );
         });
 
@@ -80,6 +84,14 @@ class Level3ServiceProvider implements ServiceProviderInterface {
                 $app['level3.loader.path'],
                 $app['level3.loader.namespace']
             );
+        });
+
+        $app['level3.resource_factory'] = $app->share(function(Application $app) {
+            return new ResourceFactory();
+        });
+
+        $app['level3.formatter_factory'] = $app->share(function (Application $app) {
+            return new FormatterFactory();
         });
         
         $app['level3.base.uri'] = '/';

@@ -14,7 +14,7 @@ use Level3\Messages\RequestFactory;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Level3\Messages\Response as Level3Response;
+use Level3\Response as Level3Response;
 
 class Controller
 {
@@ -32,67 +32,41 @@ class Controller
     public function find(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->find($level3Request);
-
-        return $this->getResponse($response);
+        return $this->processor->find($level3Request);
     }
 
     public function get(Request $request, $id = null)
     {
         $level3Request = $this->createLevel3Request($request, $id);
-        $response = $this->processor->get($level3Request);
-
-        return $this->getResponse($response);
+        return $this->processor->get($level3Request);
     }
 
     public function post(Request $request, $id)
     {
         $level3Request = $this->createLevel3Request($request, $id);
-        $response = $this->processor->post($level3Request);
-
-        return $this->getResponse($response);
+        return $this->processor->post($level3Request);
     }
 
     public function put(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->put($level3Request);
-
-        return $this->getResponse($response);
+        return $this->processor->put($level3Request);
     }
 
     public function delete(Request $request, $id)
     {
         $level3Request = $this->createLevel3Request($request, $id);
-        $response = $this->processor->delete($level3Request);
-
-        return $this->getResponse($response);
-    }
-
-    protected function getResponse(Level3Response $response)
-    {
-        return new Response(
-            $response->getContent(), 
-            $response->getStatus(),
-            $response->getHeaders()
-        );
+        return $this->processor->delete($level3Request);
     }
 
     protected function createLevel3Request(Request $request, $id = null)
     {
         $key = $this->getResourceKey($request);
-        $requestAttributes = $request->request->all();
-        $content = $request->getContent();
-        $requestHeaders = $request->headers->all();
-
         $level3Request = $this->requestFactory->clear()
             ->withKey($key)
             ->withId($id)
-            ->withAttributes($requestAttributes)
-            ->withHeaders($requestHeaders)
-            ->withContent($content)
+            ->withSymfonyRequest($request)
             ->create();
-
         return $level3Request;
     }
 
