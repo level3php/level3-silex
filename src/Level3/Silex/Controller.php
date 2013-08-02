@@ -18,13 +18,11 @@ use Level3\Response as Level3Response;
 
 class Controller
 {
-    private $app;
     private $processor;
     private $requestFactory;
 
-    public function __construct(Application $app, RequestProcessor $processor, RequestFactory $requestFactory)
+    public function __construct(RequestProcessor $processor, RequestFactory $requestFactory)
     {
-        $this->app = $app;
         $this->processor = $processor;
         $this->requestFactory = $requestFactory;
     }

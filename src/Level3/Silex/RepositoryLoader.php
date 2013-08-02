@@ -9,6 +9,7 @@
  */
 
 namespace Level3\Silex;
+use Level3\Hal\ResourceBuilderFactory;
 use Silex\Application;
 use Level3\RepositoryHub;
 
@@ -17,14 +18,22 @@ class RepositoryLoader
     const LOOKUP_PATTERN = '*.php';
     const PHP_EXTENSION = '.php';
 
-    private $app;
+    private $resourceBuilderFactory;
+    private $documentRepositoryContainer;
     private $hub;
     private $classesPath;
     private $classesNamespace;
 
-    public function __construct(Application $app, RepositoryHub $hub,  $classesPath, $classesNamespace)
+    public function __construct(
+        ResourceBuilderFactory $resourceBuilderFactory,
+        RepositoryHub $hub,
+        DocumentRepositoryContainer $documentRepositoryContainer,
+        $classesPath,
+        $classesNamespace)
     {
-        $this->app = $app;
+
+        $this->resourceBuilderFactory = $resourceBuilderFactory;
+        $this->documentRepositoryContainer = $documentRepositoryContainer;
         $this->hub = $hub;
 
         $this->classesPath = $classesPath;
@@ -47,19 +56,26 @@ class RepositoryLoader
     private function loadRepositoryDefinition($filename)
     {
         $classname = $this->getClassName($filename);
-        $namespace = $this->getNamespace($classname);
+        $getFullClassName = $this->getFullClassName($classname);
+
+        $reflectionClass = new \ReflectionClass($getFullClassName);
+        if ($reflectionClass->isAbstract()) return;
 
         $repositoryKey = $this->getRepositoryKey($classname);
-        $repositoryDefinition = $this->getRepositoryDefinition($namespace);
+        $repositoryDefinition = $this->getRepositoryDefinition($getFullClassName);
 
         $this->hub->registerDefinition($repositoryKey, $repositoryDefinition); 
     }
 
-    private function getRepositoryDefinition($namespace)
+    private function getRepositoryDefinition($fullClassName)
     {
-        $app = $this->app;
-        return function() use ($app, $namespace) {
-            return new $namespace($app);
+        return function() use ($fullClassName) {
+            $repositoryDefinition = new $fullClassName(
+                $this->resourceBuilderFactory
+            );
+            $documentRepository = $this->documentRepositoryContainer->getRepositoryForResource($fullClassName);
+            $repositoryDefinition->setDocumentRepository($documentRepository);
+            return $repositoryDefinition;
         };
     }
 
@@ -73,7 +89,7 @@ class RepositoryLoader
         return basename($filename, self::PHP_EXTENSION);
     }
 
-    private function getNamespace($classname)
+    private function getFullClassName($classname)
     {
         return $this->classesNamespace . '\\' . $classname;
     }

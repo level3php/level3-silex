@@ -16,7 +16,6 @@ use Level3\RepositoryHub;
 class RepositoryMapper extends BaseRepositoryMapper
 {
     private $app;
-    private $repositoryHub;
 
     public function __construct(Application $app, RepositoryHub $repositoryHub)
     {
