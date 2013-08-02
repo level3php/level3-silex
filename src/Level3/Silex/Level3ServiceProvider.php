@@ -63,7 +63,6 @@ class Level3ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.controller'] = $app->share(function(Application $app) {
             return new Controller(
-                $app,
                 $app['level3.accessor_wrapper'],
                 $app['level3.resquest_factory']
             );
@@ -110,7 +109,7 @@ class Level3ServiceProvider implements ServiceProviderInterface {
         $app['level3.loader.namespace'] = null;
 
         $app['level3.document_repository_container'] = $app->share(function (Application $app) {
-            return null;
+            return new DummyDocumentRepositoryContainer();
         });
     }
 
