@@ -44,7 +44,7 @@ class RepositoryLoader
     {
         $files = $this->getFilesFromClassPath();
         foreach($files as $filename) {
-            $this->loadRepositoryDefinition($filename); 
+            $this->loadRepositoryDefinition($filename);
         }
     }
 
@@ -56,13 +56,13 @@ class RepositoryLoader
     private function loadRepositoryDefinition($filename)
     {
         $classname = $this->getClassName($filename);
-        $getFullClassName = $this->getFullClassName($classname);
+        $fullClassName = $this->getFullClassName($classname);
 
-        $reflectionClass = new \ReflectionClass($getFullClassName);
+        $reflectionClass = new \ReflectionClass($fullClassName);
         if ($reflectionClass->isAbstract()) return;
 
         $repositoryKey = $this->getRepositoryKey($classname);
-        $repositoryDefinition = $this->getRepositoryDefinition($getFullClassName);
+        $repositoryDefinition = $this->getRepositoryDefinition($fullClassName);
 
         $this->hub->registerDefinition($repositoryKey, $repositoryDefinition); 
     }

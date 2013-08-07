@@ -77,7 +77,7 @@ class Level3ServiceProvider implements ServiceProviderInterface {
             $mapper->setBaseURI($app['level3.base.uri']);
             return $mapper;
         });
-        
+
         $app['level3.repository_loader'] = $app->share(function(Application $app) {
             return new RepositoryLoader(
                 $app['level3.resource_builder_factory'],
