@@ -20,6 +20,7 @@ class Controller
 {
     private $processor;
     private $requestFactory;
+    private $allowedOrigin = '';
 
     public function __construct(RequestProcessor $processor, RequestFactory $requestFactory)
     {
@@ -27,10 +28,36 @@ class Controller
         $this->requestFactory = $requestFactory;
     }
 
+    public function setAllowedOrigin($allowedOrigin)
+    {
+        $this->allowedOrigin = $allowedOrigin;
+    }
+
+    public function options(Request $request)
+    {
+        $headers = $request->headers->all();
+        $headers['Access-Control-Allow-Origin'] = $this->allowedOrigin;
+
+        if (isset($headers['access-control-request-headers'])) {
+            $headers['Access-Control-Allow-Headers'] = $headers['access-control-request-headers'];
+        }
+
+        unset($headers['access-control-request-headers']);
+        unset($headers['user-agent']);
+        unset($headers['origin']);
+        unset($headers['accept']);
+        unset($headers['accept-language']);
+        unset($headers['accept-encoding']);
+
+        return new Response('', 200, $headers);
+    }
+
     public function find(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        return $this->processor->find($level3Request);
+        $response = $this->processor->find($level3Request);
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     public function get(Request $request, $id = null)
