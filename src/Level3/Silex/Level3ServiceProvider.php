@@ -10,6 +10,8 @@
 
 namespace Level3\Silex;
 use Level3\Hal\Formatter\FormatterFactory;
+use Level3\Hal\LinkBuilder;
+use Level3\Hal\ResourceBuilderFactory;
 use Level3\Hal\ResourceFactory;
 use Silex\ServiceProviderInterface;
 use Silex\Application;
@@ -61,7 +63,6 @@ class Level3ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.controller'] = $app->share(function(Application $app) {
             return new Controller(
-                $app,
                 $app['level3.accessor_wrapper'],
                 $app['level3.resquest_factory']
             );
@@ -76,11 +77,12 @@ class Level3ServiceProvider implements ServiceProviderInterface {
             $mapper->setBaseURI($app['level3.base.uri']);
             return $mapper;
         });
-        
+
         $app['level3.repository_loader'] = $app->share(function(Application $app) {
             return new RepositoryLoader(
-                $app,
+                $app['level3.resource_builder_factory'],
                 $app['level3.repository_hub'],
+                $app['level3.document_repository_container'],
                 $app['level3.loader.path'],
                 $app['level3.loader.namespace']
             );
@@ -93,10 +95,22 @@ class Level3ServiceProvider implements ServiceProviderInterface {
         $app['level3.formatter_factory'] = $app->share(function (Application $app) {
             return new FormatterFactory();
         });
-        
+
+        $app['level3.resource_builder_factory'] = $app->share(function (Application $app) {
+                return new ResourceBuilderFactory($app['level3.repository_mapper'], $app['level3.link_builder']);
+            });
+
+        $app['level3.link_builder'] = $app->share(function (Application $app) {
+            return new LinkBuilder($app['level3.repository_mapper']);
+        });
+
         $app['level3.base.uri'] = '/';
         $app['level3.loader.path'] = null;
         $app['level3.loader.namespace'] = null;
+
+        $app['level3.document_repository_container'] = $app->share(function (Application $app) {
+            return new DummyDocumentRepositoryContainer();
+        });
     }
 
     public function boot(Application $app) {

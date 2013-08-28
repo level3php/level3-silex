@@ -23,9 +23,9 @@ class ControllerTest extends TestCase {
         $this->processorMock =  m::mock('Level3\Messages\Processors\RequestProcessor');
         $this->requestFactoryMock = m::mock('Level3\Messages\RequestFactory');
         $this->requestMock = m::mock('Level3\Messages\Request');
+        $this->symfonyRequest = new Request();
 
         $this->controller = new Controller(
-            $this->appMock, 
             $this->processorMock, 
             $this->requestFactoryMock
         );
@@ -46,6 +46,11 @@ class ControllerTest extends TestCase {
             ->shouldReceive('clear')
                 ->once()
                 ->withNoArgs()
+                ->andReturn($this->requestFactoryMock)
+            ->shouldReceive('withSymfonyRequest')
+                ->once()
+                ->with($this->symfonyRequest)
+                ->once()
                 ->andReturn($this->requestFactoryMock)
             ->shouldReceive('withKey')
                 ->once()
@@ -79,9 +84,8 @@ class ControllerTest extends TestCase {
         $this->configureRequestFactoryMock(null, null);
 
 
-        $request = new Request();
-        $request->attributes->set('_route', 'foo:bar');
-        $this->controller->find($request);
+        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
+        $this->controller->find($this->symfonyRequest);
     }
 
     public function testGet()
@@ -89,9 +93,8 @@ class ControllerTest extends TestCase {
         $this->configureProcessorMock('get');
         $this->configureRequestFactoryMock(1, null);
 
-        $request = new Request();
-        $request->attributes->set('_route', 'foo:bar');
-        $this->controller->get($request, 1);
+        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
+        $this->controller->get($this->symfonyRequest, 1);
     }
 
     public function testPost()
@@ -99,11 +102,10 @@ class ControllerTest extends TestCase {
         $this->configureProcessorMock('post');
         $this->configureRequestFactoryMock(2, array('foo' => 'bar'));
 
-        $request = new Request();
-        $request->attributes->set('_route', 'foo:bar');
-        $request->request->set('foo', 'bar');
+        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
+        $this->symfonyRequest->request->set('foo', 'bar');
 
-        $this->controller->post($request, 2);
+        $this->controller->post($this->symfonyRequest, 2);
     }
 
     public function testPut()
@@ -111,11 +113,10 @@ class ControllerTest extends TestCase {
         $this->configureProcessorMock('put');
         $this->configureRequestFactoryMock(null, array('foo' => 'bar'));
 
-        $request = new Request();
-        $request->attributes->set('_route', 'foo:bar');
-        $request->request->set('foo', 'bar');
+        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
+        $this->symfonyRequest->request->set('foo', 'bar');
 
-        $this->controller->put($request);
+        $this->controller->put($this->symfonyRequest);
     }
 
     public function testDelete()
@@ -123,10 +124,9 @@ class ControllerTest extends TestCase {
         $this->configureProcessorMock('delete');
         $this->configureRequestFactoryMock(3, null);
 
-        $request = new Request();
-        $request->attributes->set('_route', 'foo:bar');
+        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
 
-        $this->controller->delete($request, 3);
+        $this->controller->delete($this->symfonyRequest, 3);
     }
 }
 
