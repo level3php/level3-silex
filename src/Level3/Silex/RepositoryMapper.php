@@ -63,4 +63,41 @@ class RepositoryMapper extends BaseRepositoryMapper
         $alias = sprintf('%s:%s', $resourceKey, $method);
         return $this->app['url_generator']->generate($alias, $parameters);
     }
+
+    protected function calculateGeneralUri($repositoryKey)
+    {
+        if ($this->isEmbeddedDocument($repositoryKey)) {
+            $repositoryKey = $this->prepareEmbeddedRepositoryKey($repositoryKey);
+        }
+
+        return $this->baseURI . $repositoryKey;
+    }
+
+    protected function calculateParticularUri($repositoryKey)
+    {
+        if ($this->isEmbeddedDocument($repositoryKey)) {
+            $var = 'embeddedId';
+        } else {
+            $var = 'id';
+        }
+
+        return $this->calculateGeneralUri($repositoryKey) . self::SLASH_CHARACTER. '{'.$var.'}';
+    }
+
+    protected function isEmbeddedDocument($repositoryKey)
+    {
+        if (strpos($repositoryKey, self::SLASH_CHARACTER)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function prepareEmbeddedRepositoryKey($repositoryKey)
+    {
+        return str_replace(self::SLASH_CHARACTER, self::SLASH_CHARACTER . '{id}' .  self::SLASH_CHARACTER, $repositoryKey);
+    }
+
+
+
 }

@@ -60,38 +60,46 @@ class Controller
         return $response;
     }
 
-    public function get(Request $request, $id = null)
+    public function get(Request $request, $id = null, $embeddedId = null)
     {
-        $level3Request = $this->createLevel3Request($request, $id);
+        $level3Request = $this->createLevel3Request($request, $id, $embeddedId);
         return $this->processor->get($level3Request);
     }
 
-    public function post(Request $request, $id)
+    public function post(Request $request, $id, $embeddedId = null)
     {
-        $level3Request = $this->createLevel3Request($request, $id);
+        $level3Request = $this->createLevel3Request($request, $id, $embeddedId);
         return $this->processor->post($level3Request);
     }
 
-    public function put(Request $request)
+    public function put(Request $request, $embeddedId = null)
     {
-        $level3Request = $this->createLevel3Request($request);
+        $level3Request = $this->createLevel3Request($request, null, $embeddedId);
         return $this->processor->put($level3Request);
     }
 
-    public function delete(Request $request, $id)
+    public function delete(Request $request, $id, $embeddedId = null)
     {
-        $level3Request = $this->createLevel3Request($request, $id);
+        $level3Request = $this->createLevel3Request($request, $id, $embeddedId);
         return $this->processor->delete($level3Request);
     }
 
-    protected function createLevel3Request(Request $request, $id = null)
+    private function createLevel3ObjectId($id, $embeddedId = null)
+    {
+        return (object) ['id' => $id, 'embeddedId' => $embeddedId];
+    }
+
+    protected function createLevel3Request(Request $request, $id = null, $embeddedId = null)
     {
         $key = $this->getResourceKey($request);
+        $idObject = $this->createLevel3ObjectId($id, $embeddedId);
+
         $level3Request = $this->requestFactory->clear()
             ->withKey($key)
-            ->withId($id)
+            ->withId($idObject)
             ->withSymfonyRequest($request)
             ->create();
+
         return $level3Request;
     }
 

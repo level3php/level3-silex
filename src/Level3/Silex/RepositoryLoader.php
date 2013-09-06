@@ -12,11 +12,13 @@ namespace Level3\Silex;
 use Level3\Hal\ResourceBuilderFactory;
 use Silex\Application;
 use Level3\RepositoryHub;
+use ReflectionClass;
 
 class RepositoryLoader
 {
     const LOOKUP_PATTERN = '*.php';
     const PHP_EXTENSION = '.php';
+    const NAMESPACE_SEPARATOR = '\\';
 
     private $resourceBuilderFactory;
     private $documentRepositoryContainer;
@@ -48,9 +50,34 @@ class RepositoryLoader
         }
     }
 
-    private function getFilesFromClassPath()
+    private function getFilesFromClassPath() {
+        $files = $this->searchFilesRecursive($this->classesPath . self::LOOKUP_PATTERN);
+
+        return array_filter($files, function($file) {
+            return $this->isBaseOrBuilderFile($file);
+        });
+    }
+
+    private function isBaseOrBuilderFile($file)
     {
-        return glob($this->classesPath . self::LOOKUP_PATTERN);
+        $tmp = explode(DIRECTORY_SEPARATOR, $file);
+        $folder = $tmp[count($tmp) - 2];
+        if ($folder == 'Base' || $folder == 'Builder') {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function searchFilesRecursive($pattern, $flags = 0)
+    {
+        $files = glob($pattern);
+
+        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR) as $dir) {
+            $files = array_merge($files, $this->searchFilesRecursive($dir.'/'.basename($pattern), $flags));
+        }
+
+        return $files;
     }
 
     private function loadRepositoryDefinition($filename)
@@ -58,13 +85,18 @@ class RepositoryLoader
         $classname = $this->getClassName($filename);
         $fullClassName = $this->getFullClassName($classname);
 
-        $reflectionClass = new \ReflectionClass($fullClassName);
-        if ($reflectionClass->isAbstract()) return;
+        if ($this->isAbstract($fullClassName)) return;
 
         $repositoryKey = $this->getRepositoryKey($classname);
         $repositoryDefinition = $this->getRepositoryDefinition($fullClassName);
 
         $this->hub->registerDefinition($repositoryKey, $repositoryDefinition); 
+    }
+
+    private function isAbstract($fullClassName) {
+        $reflectionClass = new ReflectionClass($fullClassName);
+
+        return $reflectionClass->isAbstract();
     }
 
     private function getRepositoryDefinition($fullClassName)
@@ -73,24 +105,29 @@ class RepositoryLoader
             $repositoryDefinition = new $fullClassName(
                 $this->resourceBuilderFactory
             );
+
             $documentRepository = $this->documentRepositoryContainer->getRepositoryForResource($fullClassName);
             $repositoryDefinition->setDocumentRepository($documentRepository);
+
             return $repositoryDefinition;
         };
     }
 
     private function getRepositoryKey($classname)
     {
-        return strtolower($classname);
+        return str_replace(self::NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR, strtolower($classname));
     }
 
     private function getClassName($filename)
     {
-        return basename($filename, self::PHP_EXTENSION);
+        $fileWithOutClassesPath = str_replace($this->classesPath, '', $filename);
+        $className = str_replace(self::PHP_EXTENSION, '', $fileWithOutClassesPath);
+
+        return str_replace(DIRECTORY_SEPARATOR, self::NAMESPACE_SEPARATOR, $className);
     }
 
-    private function getFullClassName($classname)
+    private function getFullClassName($className)
     {
-        return $this->classesNamespace . '\\' . $classname;
+        return $this->classesNamespace . self::NAMESPACE_SEPARATOR . $className;
     }
 }
