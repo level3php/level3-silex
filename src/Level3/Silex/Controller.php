@@ -55,6 +55,7 @@ class Controller
     public function find(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
+        
         $response = $this->processor->find($level3Request);
         $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
