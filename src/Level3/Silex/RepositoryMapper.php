@@ -64,7 +64,11 @@ class RepositoryMapper extends BaseRepositoryMapper
     public function getURI($resourceKey, $method, Parameters $parameters = null)
     {
         $alias = sprintf('%s:%s', $resourceKey, $method);
-        return $this->app['url_generator']->generate($alias, (array) $parameters);
+        
+        $parametersAsArray = array();
+        if ($parameters) $parametersAsArray = $parameters->all();
+
+        return $this->app['url_generator']->generate($alias, $parametersAsArray);
     }
 
     protected function calculateGeneralUri($repositoryKey)
