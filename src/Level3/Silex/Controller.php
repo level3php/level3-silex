@@ -55,53 +55,43 @@ class Controller
     public function find(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        
         $response = $this->processor->find($level3Request);
+
         $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
-    public function get(Request $request, $id = null, $embeddedId = null)
+    public function get(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request, $id, $embeddedId);
+        $level3Request = $this->createLevel3Request($request);
         return $this->processor->get($level3Request);
     }
 
-    public function post(Request $request, $id, $embeddedId = null)
+    public function post(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request, $id, $embeddedId);
+        $level3Request = $this->createLevel3Request($request);
         return $this->processor->post($level3Request);
     }
 
-    public function put(Request $request, $embeddedId = null)
+    public function put(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request, null, $embeddedId);
+        $level3Request = $this->createLevel3Request($request);
         return $this->processor->put($level3Request);
     }
 
-    public function delete(Request $request, $id, $embeddedId = null)
+    public function delete(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request, $id, $embeddedId);
+        $level3Request = $this->createLevel3Request($request);
         return $this->processor->delete($level3Request);
     }
 
-    private function createLevel3ObjectId($id, $embeddedId = null)
-    {
-        return (object) ['id' => $id, 'embeddedId' => $embeddedId];
-    }
 
-    protected function createLevel3Request(Request $request, $id = null, $embeddedId = null)
+    protected function createLevel3Request(Request $request)
     {
-        $key = $this->getResourceKey($request);
-        $idObject = $this->createLevel3ObjectId($id, $embeddedId);
-
-        $level3Request = $this->requestFactory->clear()
-            ->withKey($key)
-            ->withId($idObject)
+        return $this->requestFactory->clear()
+            ->withKey($this->getResourceKey($request))
             ->withSymfonyRequest($request)
             ->create();
-
-        return $level3Request;
     }
 
     protected function getResourceKey(Request $request)

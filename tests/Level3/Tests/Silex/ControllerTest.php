@@ -31,6 +31,11 @@ class ControllerTest extends TestCase {
         );
     }
 
+    protected function createParametersMock()
+    {
+        return m::mock('Level3\Messages\Parameters');
+    }
+
     private function configureProcessorMock($method)
     {
         $this->processorMock
@@ -56,9 +61,9 @@ class ControllerTest extends TestCase {
                 ->once()
                 ->with('foo')
                 ->andReturn($this->requestFactoryMock)
-            ->shouldReceive('withId')
+            ->shouldReceive('withParameters')
                 ->once()
-                ->with($id)
+                ->with($this->createParametersMock())
                 ->andReturn($this->requestFactoryMock)
             ->shouldReceive('withAttributes')
                 ->once()

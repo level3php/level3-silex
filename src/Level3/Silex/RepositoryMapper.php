@@ -12,7 +12,8 @@ namespace Level3\Silex;
 use Silex\Application;
 use Level3\RepositoryMapper as BaseRepositoryMapper;
 use Level3\RepositoryHub;
-use stdClass;
+use Level3\Messages\Parameters;
+
 
 class RepositoryMapper extends BaseRepositoryMapper
 {
@@ -60,7 +61,7 @@ class RepositoryMapper extends BaseRepositoryMapper
             bind(sprintf('%s:delete', $resourceKey));
     }
 
-    public function getURI($resourceKey, $method, stdClass $parameters = null)
+    public function getURI($resourceKey, $method, Parameters $parameters = null)
     {
         $alias = sprintf('%s:%s', $resourceKey, $method);
         return $this->app['url_generator']->generate($alias, (array) $parameters);
