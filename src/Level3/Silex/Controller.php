@@ -64,25 +64,39 @@ class Controller
     public function get(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        return $this->processor->get($level3Request);
+        $response = $this->processor->get($level3Request);
+
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     public function post(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        return $this->processor->post($level3Request);
+        $response = $this->processor->post($level3Request);
+
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     public function put(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        return $this->processor->put($level3Request);
+        
+        $response = $this->processor->put($level3Request);
+
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     public function delete(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        return $this->processor->delete($level3Request);
+
+        $response = $this->processor->delete($level3Request);
+
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
 
