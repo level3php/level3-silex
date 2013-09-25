@@ -43,14 +43,14 @@ class RepositoryMapper extends BaseRepositoryMapper
     public function mapPost($resourceKey, $uri)
     {
         $this->app->
-            post($uri, 'level3.controller:post')->
+            put($uri, 'level3.controller:post')->
             bind(sprintf('%s:post', $resourceKey));
     }
     
     public function mapPut($resourceKey, $uri)
     {
         $this->app->
-            put($uri, 'level3.controller:put')->
+            post($uri, 'level3.controller:put')->
             bind(sprintf('%s:put', $resourceKey));
     }
     
