@@ -57,7 +57,6 @@ class Controller
         $level3Request = $this->createLevel3Request($request);
         $response = $this->processor->find($level3Request);
 
-        $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
@@ -66,7 +65,6 @@ class Controller
         $level3Request = $this->createLevel3Request($request);
         $response = $this->processor->get($level3Request);
 
-        $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
@@ -75,27 +73,22 @@ class Controller
         $level3Request = $this->createLevel3Request($request);
         $response = $this->processor->post($level3Request);
 
-        $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
     public function put(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-        
         $response = $this->processor->put($level3Request);
 
-        $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
     public function delete(Request $request)
     {
         $level3Request = $this->createLevel3Request($request);
-
         $response = $this->processor->delete($level3Request);
 
-        $response->addHeader('Access-Control-Allow-Origin', '*');
         return $response;
     }
 

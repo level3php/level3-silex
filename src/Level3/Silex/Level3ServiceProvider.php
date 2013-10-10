@@ -9,56 +9,38 @@
  */
 
 namespace Level3\Silex;
-use Level3\Hal\Formatter\FormatterFactory;
-use Level3\Hal\LinkBuilder;
-use Level3\Hal\ResourceBuilderFactory;
-use Level3\Hal\ResourceFactory;
+
 use Silex\ServiceProviderInterface;
 use Silex\Application;
 
-use Level3\RepositoryHub;
-use Level3\Accessor;
-use Level3\Resources;
-
-use Level3\Messages\Processors\AccessorWrapper;
-use Level3\Messages\Parser\ParserFactory;
-use Level3\Messages\ResponseFactory;
-use Level3\Messages\RequestFactory;
+use Level3\Level3;
+use Level3\Hub;
+use Level3\Processor;
 
 class Level3ServiceProvider implements ServiceProviderInterface {
 
     public function register(Application $app) {
-        $app['level3.repository_hub']  = $app->share(function(Application $app) {
-            return new RepositoryHub();
-        });
-
-        $app['level3.response_factory']  = $app->share(function(Application $app) {
-            return new ResponseFactory(
-                $app['level3.resource_factory'],
-                $app['level3.formatter_factory']
+        $app['level3']  = $app->share(function(Application $app) {
+            return new Level3(
+                $app['level3.mapper'], 
+                $app['level3.hub'],
+                $app['level3.processor']
             );
         });
 
-        $app['level3.resquest_factory']  = $app->share(function(Application $app) {
-            return new RequestFactory();
+        $app['level3.mapper']  = $app->share(function(Application $app) {
+            $mapper = new Mapper($app);
+            $mapper->setBaseURI($app['level3.base_uri']);
+            
+            return $mapper;
         });
 
-        $app['level3.parser_factory']  = $app->share(function(Application $app) {
-            return new ParserFactory();
+        $app['level3.hub']  = $app->share(function(Application $app) {
+            return new Hub();
         });
 
-        $app['level3.accessor'] = $app->share(function(Application $app) {
-            return new Accessor(
-                $app['level3.repository_hub']
-            );
-        });
-
-        $app['level3.accessor_wrapper'] = $app->share(function(Application $app) {
-            return new AccessorWrapper(
-                $app['level3.accessor'],
-                $app['level3.response_factory'],
-                $app['level3.parser_factory']
-            );
+        $app['level3.processor']  = $app->share(function(Application $app) {
+            return new Processor();
         });
 
         $app['level3.controller'] = $app->share(function(Application $app) {
@@ -68,45 +50,7 @@ class Level3ServiceProvider implements ServiceProviderInterface {
             );
         });
 
-        $app['level3.repository_mapper'] = $app->share(function(Application $app) {
-            $mapper = new RepositoryMapper(
-                $app,
-                $app['level3.repository_hub']
-            );
-
-            $mapper->setBaseURI($app['level3.base.uri']);
-            return $mapper;
-        });
-
-        $app['level3.repository_loader'] = $app->share(function(Application $app) {
-            return new RepositoryLoader(
-                $app['level3.resource_builder_factory'],
-                $app['level3.repository_hub'],
-                $app['level3.document_repository_container'],
-                $app['level3.loader.path'],
-                $app['level3.loader.namespace']
-            );
-        });
-
-        $app['level3.resource_factory'] = $app->share(function(Application $app) {
-            return new ResourceFactory();
-        });
-
-        $app['level3.formatter_factory'] = $app->share(function (Application $app) {
-            return new FormatterFactory();
-        });
-
-        $app['level3.resource_builder_factory'] = $app->share(function (Application $app) {
-                return new ResourceBuilderFactory($app['level3.repository_mapper'], $app['level3.link_builder']);
-            });
-
-        $app['level3.link_builder'] = $app->share(function (Application $app) {
-            return new LinkBuilder($app['level3.repository_mapper']);
-        });
-
-        $app['level3.base.uri'] = '/';
-        $app['level3.loader.path'] = null;
-        $app['level3.loader.namespace'] = null;
+        $app['level3.base_uri'] = '/';
 
         $app['level3.document_repository_container'] = $app->share(function (Application $app) {
             return new DummyDocumentRepositoryContainer();
@@ -114,9 +58,6 @@ class Level3ServiceProvider implements ServiceProviderInterface {
     }
 
     public function boot(Application $app) {
-        $app['level3.repository_loader']->registerRepositories();
-        $app['level3.repository_mapper']->boot();
+        $app['level3']->boot();
     }
 }
-
-
