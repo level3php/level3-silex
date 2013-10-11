@@ -9,96 +9,62 @@
  */
 
 namespace Level3\Silex;
-use Level3\Messages\Processors\RequestProcessor;
-use Level3\Messages\RequestFactory;
-use Silex\Application;
+
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Level3\Response as Level3Response;
+use Silex\Application;
+use Level3\Level3;
+use Level3\Messages;
 
 class Controller
 {
-    private $processor;
-    private $requestFactory;
-    private $allowedOrigin = '';
+    private $level3;
 
-    public function __construct(RequestProcessor $processor, RequestFactory $requestFactory)
+    public function __construct(Level3 $level3)
     {
-        $this->processor = $processor;
-        $this->requestFactory = $requestFactory;
-    }
-
-    public function setAllowedOrigin($allowedOrigin)
-    {
-        $this->allowedOrigin = $allowedOrigin;
-    }
-
-    public function options(Request $request)
-    {
-        $headers = $request->headers->all();
-        $headers['Access-Control-Allow-Origin'] = $this->allowedOrigin;
-
-        if (isset($headers['access-control-request-headers'])) {
-            $headers['Access-Control-Allow-Headers'] = $headers['access-control-request-headers'];
-        }
-
-        unset($headers['access-control-request-headers']);
-        unset($headers['user-agent']);
-        unset($headers['origin']);
-        unset($headers['accept']);
-        unset($headers['accept-language']);
-        unset($headers['accept-encoding']);
-
-        return new Response('', 200, $headers);
+        $this->level3 = $level3;
     }
 
     public function find(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->find($level3Request);
-
-        return $response;
+        return $this->callMethod($request, __FUNCTION__);
     }
 
     public function get(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->get($level3Request);
-
-        return $response;
+        return $this->callMethod($request, __FUNCTION__);
     }
 
     public function post(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->post($level3Request);
-
-        return $response;
+        return $this->callMethod($request, __FUNCTION__);
     }
 
     public function put(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->put($level3Request);
-
-        return $response;
+        return $this->callMethod($request, __FUNCTION__);
     }
 
     public function delete(Request $request)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->processor->delete($level3Request);
-
-        return $response;
+        return $this->callMethod($request, __FUNCTION__);
     }
 
-
-    protected function createLevel3Request(Request $request)
+    public function options(Request $request)
     {
-        return $this->requestFactory->clear()
-            ->withKey($this->getResourceKey($request))
-            ->withSymfonyRequest($request)
-            ->create();
+        return $this->callMethod($request, __FUNCTION__);
+    }
+
+    protected function callMethod(Request $request, $method)
+    {
+        $level3Request = $this->createLevel3Request($request);
+        $response = $this->getProcessor()->$method($level3Request);
+
+        return $response; 
+    }
+
+    protected function getProcessor()
+    {
+        return $this->level3->getProcessor();
     }
 
     protected function getResourceKey(Request $request)
@@ -107,5 +73,10 @@ class Controller
 
         $route = explode(':', $params['_route']);
         return $route[0];
+    }
+    
+    protected function createLevel3Request(Request $request)
+    {
+        return new Messages\Request($this->getResourceKey($request), $request);
     }
 }

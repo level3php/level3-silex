@@ -45,16 +45,11 @@ class Level3ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.controller'] = $app->share(function(Application $app) {
             return new Controller(
-                $app['level3.accessor_wrapper'],
-                $app['level3.resquest_factory']
+                $app['level3']
             );
         });
 
         $app['level3.base_uri'] = '/';
-
-        $app['level3.document_repository_container'] = $app->share(function (Application $app) {
-            return new DummyDocumentRepositoryContainer();
-        });
     }
 
     public function boot(Application $app) {
