@@ -54,7 +54,8 @@ class Mapper extends BaseMapper
     public function mapPatcher($resourceKey, $uri)
     {
         $this->app->
-            patch($uri, 'level3.controller:patch')->
+            match($uri, 'level3.controller:patch')->
+            method('PATCH')->
             bind(sprintf('%s:patch', $resourceKey));
     }
     

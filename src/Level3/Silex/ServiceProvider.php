@@ -49,7 +49,7 @@ class ServiceProvider implements ServiceProviderInterface {
             );
         });
 
-        $app['level3.base_uri'] = '/';
+        $app['level3.base_uri'] = '';
     }
 
     public function boot(Application $app) {
