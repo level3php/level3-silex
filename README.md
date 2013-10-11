@@ -28,20 +28,14 @@ You can see [the package information on Packagist.](https://packagist.org/packag
 Parameters
 ------------
 
-* ```level3.base.uri``` (default '/'): base URI for the API
-
-If you want to use the RepositoryLodaer you must set the next settings:
-* ```level3.loader.path```: where the Repository classes are.
-* ```level3.loader.namespace```: ant the namespace use in this classes
+* ```level3.base_uri``` (default '/'): base URI for the API
 
 Registrating
 ------------
 
 ```PHP
-$app->register(new Level3\Silex\Level3ServiceProvider(), array(
-    'level3.loader.path' => '/api/'',
-    'mongator.models.output' => 'src/',
-    'mongator.connection.database' => 'your_db'
+$app->register(new Level3\Silex\ServiceProvider(), array(
+    'level3.loader.path' => '/api'
 ));
 ```
 
