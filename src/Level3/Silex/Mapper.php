@@ -54,7 +54,7 @@ class Mapper extends BaseMapper
     public function mapPatcher($resourceKey, $uri)
     {
         $this->app->
-            delete($uri, 'level3.controller:patch')->
+            patch($uri, 'level3.controller:patch')->
             bind(sprintf('%s:patch', $resourceKey));
     }
     
@@ -67,6 +67,9 @@ class Mapper extends BaseMapper
     
     public function mapOptions($resourceKey, $uri)
     {
-        
+        $this->app->
+            match($uri, 'level3.controller:options')->
+            method('OPTIONS')->
+            bind(sprintf('%s:options', $resourceKey));
     }
 }
