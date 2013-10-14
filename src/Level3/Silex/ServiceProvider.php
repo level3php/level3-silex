@@ -20,6 +20,7 @@ use Level3\Processor\Wrapper\ExceptionHandler;
 use Level3\Processor\Wrapper\CrossOriginResourceSharing;
 use Level3\Processor\Wrapper\Logger;
 use Level3\Processor\Wrapper\RateLimiter;
+use Level3\Processor\Wrapper\Authenticator;
 use Level3\Exceptions\HTTPException;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -52,8 +53,17 @@ class ServiceProvider implements ServiceProviderInterface {
             );
         });
 
+
         $app['level3.wrapper.exception_handler'] = $app->share(function(Application $app) {
             return new ExceptionHandler();
+        });
+
+        $app['level3.wrapper.authenticator'] = $app->share(function(Application $app) {
+            if ($app['level3.wrapper.authenticator.method']) {
+                return new Authenticator(
+                    $app['level3.wrapper.authenticator.method']
+                );
+            }
         });
 
         $app['level3.wrapper.cors'] = $app->share(function(Application $app) {
@@ -82,6 +92,11 @@ class ServiceProvider implements ServiceProviderInterface {
                 $app['level3.processor']
             );
 
+
+            if ($app['level3.enable.wrapper.authenticator'] && $app['level3.wrapper.authenticator']) {
+                $level3->addProcessorWrapper($app['level3.wrapper.authenticator']);
+            }
+
             if ($app['level3.enable.wrapper.limiter'] && $app['level3.wrapper.limiter']) {
                 $level3->addProcessorWrapper($app['level3.wrapper.limiter']);
             }
@@ -102,6 +117,7 @@ class ServiceProvider implements ServiceProviderInterface {
         $app['level3.enable.wrapper.limiter'] = false;
         $app['level3.enable.wrapper.cors'] = false;
         $app['level3.enable.wrapper.logger'] = false;
+        $app['level3.enable.wrapper.authenticator'] = false;
 
         $app['level3.base_uri'] = '';
         $app['level3.logger'] = null;
