@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 use Level3\Level3;
 use Level3\Messages;
+use Exception;
 
 class Controller
 {
@@ -39,6 +40,11 @@ class Controller
         return $this->callMethod($request, __FUNCTION__);
     }
 
+    public function patch(Request $request)
+    {
+        return $this->callMethod($request, __FUNCTION__);
+    }
+
     public function put(Request $request)
     {
         return $this->callMethod($request, __FUNCTION__);
@@ -52,6 +58,14 @@ class Controller
     public function options(Request $request)
     {
         return $this->callMethod($request, __FUNCTION__);
+    }
+
+    public function error(Request $request, Exception $exception)
+    {
+        $level3Request = $this->createLevel3Request($request);
+        $response = $this->getProcessor()->error($level3Request, $exception);
+
+        return $response;
     }
 
     protected function callMethod(Request $request, $method)
@@ -70,6 +84,10 @@ class Controller
     protected function getResourceKey(Request $request)
     {
         $params = $request->attributes->all();
+        
+        if (!isset($params['_route'])) {
+            return false;
+        }
 
         $route = explode(':', $params['_route']);
         return $route[0];

@@ -71,6 +71,6 @@ class Mapper extends BaseMapper
         $this->app->
             match($uri, 'level3.controller:options')->
             method('OPTIONS')->
-            bind(sprintf('%s:options', $resourceKey));
+            bind(sprintf('%s:options:%s', $resourceKey, md5($uri)));
     }
 }
