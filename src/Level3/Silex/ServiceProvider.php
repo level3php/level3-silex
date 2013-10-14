@@ -21,6 +21,7 @@ use Level3\Processor\Wrapper\CrossOriginResourceSharing;
 use Level3\Processor\Wrapper\Logger;
 use Level3\Processor\Wrapper\RateLimiter;
 use Level3\Processor\Wrapper\Authenticator;
+use Level3\Processor\Wrapper\BasicIpFirewall;
 use Level3\Exceptions\HTTPException;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -53,19 +54,32 @@ class ServiceProvider implements ServiceProviderInterface {
             );
         });
 
-
         $app['level3.wrapper.exception_handler'] = $app->share(function(Application $app) {
             return new ExceptionHandler();
         });
 
         $app['level3.wrapper.authenticator'] = $app->share(function(Application $app) {
-            if ($app['level3.wrapper.authenticator.method']) {
-                return new Authenticator(
-                    $app['level3.wrapper.authenticator.method']
-                );
-            }
+            return new Authenticator();
         });
 
+        $app['level3.wrapper.basic_ip_firewall'] = $app->share(function(Application $app) {
+            $firewall = new BasicIpFirewall();
+
+            if (strlen($app['level3.firewall.blacklist']) != 0) {
+                foreach(explode(',', $app['level3.firewall.blacklist']) as $ip) {
+                    $firewall->addIpToBlacklist($ip);
+                }
+            }
+
+            if (strlen($app['level3.firewall.whitelist']) != 0) {
+                foreach(explode(',', $app['level3.firewall.whitelist']) as $ip) {
+                    $firewall->addIpToWhitelist($ip);
+                }
+            }
+
+            return $firewall;
+        });
+    
         $app['level3.wrapper.cors'] = $app->share(function(Application $app) {
             $cors = new CrossOriginResourceSharing();
             $cors->setAllowOrigin($app['level3.cors.allowed_origins']);
@@ -93,19 +107,23 @@ class ServiceProvider implements ServiceProviderInterface {
             );
 
 
-            if ($app['level3.enable.wrapper.authenticator'] && $app['level3.wrapper.authenticator']) {
+            if ($app['level3.enable.firewall'] && $app['level3.wrapper.basic_ip_firewall']) {
+                $level3->addProcessorWrapper($app['level3.wrapper.basic_ip_firewall']);
+            }
+
+            if ($app['level3.enable.authenticator'] && $app['level3.wrapper.authenticator']) {
                 $level3->addProcessorWrapper($app['level3.wrapper.authenticator']);
             }
 
-            if ($app['level3.enable.wrapper.limiter'] && $app['level3.wrapper.limiter']) {
+            if ($app['level3.enable.limiter'] && $app['level3.wrapper.limiter']) {
                 $level3->addProcessorWrapper($app['level3.wrapper.limiter']);
             }
 
-            if ($app['level3.enable.wrapper.cors'] && $app['level3.wrapper.cors']) {
+            if ($app['level3.enable.cors'] && $app['level3.wrapper.cors']) {
                 $level3->addProcessorWrapper($app['level3.wrapper.cors']);
             }
 
-            if ($app['level3.enable.wrapper.logger'] && $app['level3.wrapper.logger']) {
+            if ($app['level3.enable.logger'] && $app['level3.wrapper.logger']) {
                 $level3->addProcessorWrapper($app['level3.wrapper.logger']);
             }
 
@@ -114,15 +132,18 @@ class ServiceProvider implements ServiceProviderInterface {
             return $level3;
         });
 
-        $app['level3.enable.wrapper.limiter'] = false;
-        $app['level3.enable.wrapper.cors'] = false;
-        $app['level3.enable.wrapper.logger'] = false;
-        $app['level3.enable.wrapper.authenticator'] = false;
+        $app['level3.enable.limiter'] = false;
+        $app['level3.enable.cors'] = false;
+        $app['level3.enable.logger'] = false;
+        $app['level3.enable.authenticator'] = false;
+        $app['level3.enable.firewall'] = false;
 
         $app['level3.base_uri'] = '';
         $app['level3.logger'] = null;
         $app['level3.redis'] = null;
 
+        $app['level3.firewall.blacklist'] = null;
+        $app['level3.firewall.whitelist'] = null;
         $app['level3.cors.allowed_origins'] = CrossOriginResourceSharing::ALLOW_ORIGIN_WILDCARD;
     }
 
