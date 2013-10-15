@@ -79,10 +79,14 @@ class ServiceProvider implements ServiceProviderInterface {
 
             return $firewall;
         });
-    
+
         $app['level3.wrapper.cors'] = $app->share(function(Application $app) {
             $cors = new CrossOriginResourceSharing();
             $cors->setAllowOrigin($app['level3.cors.allowed_origins']);
+            
+            if ($app['level3.cors.allow_headers']) {
+                $cors->setAllowHeaders(explode(',', $app['level3.cors.allow_headers']));
+            }
 
             return $cors;
         });
@@ -145,6 +149,7 @@ class ServiceProvider implements ServiceProviderInterface {
         $app['level3.firewall.blacklist'] = null;
         $app['level3.firewall.whitelist'] = null;
         $app['level3.cors.allowed_origins'] = CrossOriginResourceSharing::ALLOW_ORIGIN_WILDCARD;
+        $app['level3.cors.allow_headers'] = null;
     }
 
     public function boot(Application $app) {
