@@ -82,19 +82,55 @@ class ServiceProvider implements ServiceProviderInterface {
 
         $app['level3.wrapper.cors'] = $app->share(function(Application $app) {
             $cors = new CrossOriginResourceSharing();
-            $cors->setAllowOrigin($app['level3.cors.allowed_origins']);
             
+            if ($origins = explode(',', $app['level3.cors.allowed_origins'])) {
+                if (count($origins) == 1) {
+                    $cors->setAllowOrigin($origins[0]);
+                } else {
+                    $cors->setMultipleAllowOrigin($origins);
+                }
+            }
+                        
+            if ($app['level3.cors.expose_headers']) {
+                $cors->setExposeHeaders(explode(',', $app['level3.cors.expose_headers']));
+            }
+                        
+            if ($app['level3.cors.max_age'] !== null) {
+                $cors->setExposeHeaders((int) $app['level3.cors.max_age']);
+            }
+
+            if ($app['level3.cors.allow_credentials'] !== null) {
+                $cors->setExposeHeaders((boolean) $app['level3.cors.allow_credentials']);
+            }
+
+            if ($app['level3.cors.allow_methods']) {
+                $cors->setAllowHeaders(explode(',', $app['level3.cors.allow_methods']));
+            }
+
             if ($app['level3.cors.allow_headers']) {
                 $cors->setAllowHeaders(explode(',', $app['level3.cors.allow_headers']));
             }
+
 
             return $cors;
         });
 
         $app['level3.wrapper.limiter'] = $app->share(function(Application $app) {
-            if ($app['level3.redis']) {
-                return new RateLimiter($app['level3.redis']);
+            if (!$app['level3.redis']) {
+                return null;
             }
+
+            $limiter = new RateLimiter($app['level3.redis']);
+
+            if ($app['level3.limiter.max_request'] !== null) {
+                $limiter->setLimit($app['level3.limiter.max_request']);
+            }
+
+            if ($app['level3.limiter.time_period'] !== null) {
+                $limiter->setResetAfterSecs($app['level3.limiter.time_period']);
+            }
+
+            return $limiter;
         });
 
         $app['level3.wrapper.logger'] = $app->share(function(Application $app) {
@@ -109,7 +145,6 @@ class ServiceProvider implements ServiceProviderInterface {
                 $app['level3.hub'],
                 $app['level3.processor']
             );
-
 
             if ($app['level3.enable.firewall'] && $app['level3.wrapper.basic_ip_firewall']) {
                 $level3->addProcessorWrapper($app['level3.wrapper.basic_ip_firewall']);
@@ -146,9 +181,17 @@ class ServiceProvider implements ServiceProviderInterface {
         $app['level3.logger'] = null;
         $app['level3.redis'] = null;
 
+        $app['level3.limiter.max_request'] = null;
+        $app['level3.limiter.time_period'] = null;
+
         $app['level3.firewall.blacklist'] = null;
         $app['level3.firewall.whitelist'] = null;
+
         $app['level3.cors.allowed_origins'] = CrossOriginResourceSharing::ALLOW_ORIGIN_WILDCARD;
+        $app['level3.cors.expose_headers'] = null;
+        $app['level3.cors.max_age'] = null;
+        $app['level3.cors.allow_credentials'] = null;
+        $app['level3.cors.allow_methods'] = null;
         $app['level3.cors.allow_headers'] = null;
     }
 
