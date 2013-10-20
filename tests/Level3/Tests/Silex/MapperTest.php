@@ -57,7 +57,7 @@ class RepositoryMapperTest extends TestCase {
             array('mapPoster', 'post', 'level3.controller:post', 'foo:post'),
             array('mapPutter', 'put', 'level3.controller:put', 'foo:put'),
             array('mapDeleter', 'delete', 'level3.controller:delete', 'foo:delete'),
-            array('mapOptions', 'match', 'level3.controller:options', 'foo:options')
+            //array('mapOptions', 'match', 'level3.controller:options', 'foo:options')
         );
     }
 }
