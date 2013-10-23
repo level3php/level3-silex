@@ -29,6 +29,31 @@ Parameters
 ------------
 
 * ```level3.base_uri``` (default '/'): base URI for the API
+* ```level3.logger``` (default false):
+* ```level3.redis``` (default false):
+
+###Request limiter
+* ```level3.enable.limiter``` (default false):
+* ```level3.limiter.max_request``` (default false):
+* ```level3.limiter.time_period``` (default false):
+
+###Firewall
+* ```level3.enable.firewall``` (default false):
+* ```level3.firewall.blacklist``` (default false):
+* ```level3.firewall.whitelist``` (default false):
+
+###Cross-origin resource sharing:
+* ```level3.enable.cors``` (default false):
+* ```level3.cors.allowed_origins``` (default '*'):
+* ```level3.cors.expose_headers``` (default false):
+* ```level3.cors.max_age``` (default false):
+* ```level3.cors.allow_credentials``` (default false):
+* ```level3.cors.allow_methods``` (default false):
+* ```level3.cors.allow_headers``` (default false):
+
+###Other services:
+* ```level3.enable.logger``` (default false):
+* ```level3.enable.authenticator``` (default false):
 
 Registrating
 ------------
