@@ -1,4 +1,4 @@
-Level3 Silex Provider [![Build Status](https://travis-ci.org/yunait/level3-silex.png?branch=master)](https://travis-ci.org/yunait/level3-silex)
+Level3 Silex Provider [![Build Status](https://travis-ci.org/level3php/level3-silex.png?branch=master)](https://travis-ci.org/level3php/level3-silex)
 ==============================
 
 Provider for using Level3 with Silex framework
@@ -7,20 +7,20 @@ Provider for using Level3 with Silex framework
 Requirements
 ------------
 
-* PHP 5.3.x
+* PHP 5.4.x
 * Unix system
-* yunait/level3
+* level3php/level3
 
 Installation
 ------------
 
 The recommended way to install Level3/Silex is [through composer](http://getcomposer.org).
-You can see [the package information on Packagist.](https://packagist.org/packages/yunait/level3-silex)
+You can see [the package information on Packagist.](https://packagist.org/packages/level3php/level3-silex)
 
 ```JSON
 {
     "require": {
-        "yunait/level3-silex": "dev-master"
+        "level3php/level3-silex": "dev-master"
     }
 }
 ```
