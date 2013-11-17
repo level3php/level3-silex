@@ -1,5 +1,5 @@
 {
-    "name": "level3php/level3-silex",
+    "name": "level3/silex",
     "type": "library",
     "description": "Provider to use Level3 with Silex framework",
     "license": "MIT",
