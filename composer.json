@@ -11,8 +11,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.0",
-        "level3php/level3": "dev-master"
+        "php": ">=5.4.0",
+        "level3/level3": "dev-master"
     },
     "require-dev": {
         "mockery/mockery": "*",
