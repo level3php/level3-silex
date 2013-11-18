@@ -15,12 +15,12 @@ Installation
 ------------
 
 The recommended way to install Level3/Silex is [through composer](http://getcomposer.org).
-You can see [the package information on Packagist.](https://packagist.org/packages/level3php/silex)
+You can see [the package information on Packagist.](https://packagist.org/packages/level3/silex)
 
 ```JSON
 {
     "require": {
-        "level3php/silex": "dev-master"
+        "level3/silex": "dev-master"
     }
 }
 ```
