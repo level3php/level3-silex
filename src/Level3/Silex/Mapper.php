@@ -12,7 +12,7 @@ namespace Level3\Silex;
 
 use Silex\Application;
 use Level3\Mapper as BaseMapper;
-use Level3\Resource\Parameters;
+use Level3\Messages\Parameters;
 
 class Mapper extends BaseMapper
 {
