@@ -33,7 +33,7 @@ class ControllerTest extends TestCase {
 
     protected function createParametersMock()
     {
-        return m::mock('Level3\Messages\Parameters');
+        return m::mock('Symfony\Component\HttpFoundation\ParameterBag');
     }
 
     protected function configureProcessorMock($method)

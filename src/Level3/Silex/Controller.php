@@ -70,8 +70,8 @@ class Controller
 
     protected function callMethod(Request $request, $method)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->getProcessor()->$method($level3Request);
+        $repositoryKey = $this->getResourceKey($request)
+        $response = $this->getProcessor()->$method($repositoryKey, $request);
 
         return $response; 
     }
@@ -83,18 +83,12 @@ class Controller
 
     protected function getResourceKey(Request $request)
     {
-        $params = $request->attributes->all();
-        
-        if (!isset($params['_route'])) {
+        $route = $request->attributes->get('_route');
+        if (!$route) {
             return false;
         }
 
-        $route = explode(':', $params['_route']);
+        $route = explode(':', $route);
         return $route[0];
-    }
-    
-    protected function createLevel3Request(Request $request)
-    {
-        return new Messages\Request($this->getResourceKey($request), $request);
     }
 }
