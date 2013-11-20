@@ -61,8 +61,7 @@ class Controller
 
     public function error(Request $request, Exception $exception)
     {
-        $level3Request = $this->createLevel3Request($request);
-        $response = $this->getProcessor()->error($level3Request, $exception);
+        $response = $this->getProcessor()->error($request, $exception);
 
         return $response;
     }
