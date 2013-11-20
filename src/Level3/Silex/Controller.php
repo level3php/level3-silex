@@ -10,10 +10,9 @@
 
 namespace Level3\Silex;
 
-use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 use Level3\Level3;
-use Level3\Messages;
+use Level3\Messages\Request;
 use Exception;
 
 class Controller
@@ -70,7 +69,7 @@ class Controller
 
     protected function callMethod(Request $request, $method)
     {
-        $repositoryKey = $this->getResourceKey($request)
+        $repositoryKey = $this->getResourceKey($request);
         $response = $this->getProcessor()->$method($repositoryKey, $request);
 
         return $response; 
