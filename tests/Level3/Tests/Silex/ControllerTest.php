@@ -10,7 +10,8 @@
 
 namespace Level3\Tests\Silex;
 use Level3\Silex\Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Level3\Messages\Request;
+
 use Mockery as m;
 
 class ControllerTest extends TestCase {
@@ -27,7 +28,7 @@ class ControllerTest extends TestCase {
             ->withNoArgs()->once()
             ->andReturn($this->processorMock);
         
-        $this->symfonyRequest = new Request();
+        $this->request = new Request();
         $this->controller = new Controller($this->level3Mock);
     }
 
@@ -36,10 +37,10 @@ class ControllerTest extends TestCase {
         return m::mock('Symfony\Component\HttpFoundation\ParameterBag');
     }
 
-    protected function configureProcessorMock($method)
+    protected function configureProcessorMock($method, $key = 'foo')
     {
         $this->processorMock->shouldReceive($method)
-            ->with(m::type('Level3\Messages\Request'))
+            ->with($key, m::type('Level3\Messages\Request'))
             ->once();
     }
 
@@ -47,45 +48,45 @@ class ControllerTest extends TestCase {
     {
         $this->configureProcessorMock('find');
 
-        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
-        $this->controller->find($this->symfonyRequest);
+        $this->request->attributes->set('_route', 'foo:bar');
+        $this->controller->find($this->request);
     }
 
     public function testGet()
     {
         $this->configureProcessorMock('get');
 
-        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
-        $this->controller->get($this->symfonyRequest, 1);
+        $this->request->attributes->set('_route', 'foo:bar');
+        $this->controller->get($this->request, 1);
     }
 
     public function testPost()
     {
         $this->configureProcessorMock('post');
 
-        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
-        $this->symfonyRequest->request->set('foo', 'bar');
+        $this->request->attributes->set('_route', 'foo:bar');
+        $this->request->request->set('foo', 'bar');
 
-        $this->controller->post($this->symfonyRequest, 2);
+        $this->controller->post($this->request, 2);
     }
 
     public function testPut()
     {
         $this->configureProcessorMock('put');
 
-        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
-        $this->symfonyRequest->request->set('foo', 'bar');
+        $this->request->attributes->set('_route', 'foo:bar');
+        $this->request->request->set('foo', 'bar');
 
-        $this->controller->put($this->symfonyRequest);
+        $this->controller->put($this->request);
     }
 
     public function testDelete()
     {
         $this->configureProcessorMock('delete');
 
-        $this->symfonyRequest->attributes->set('_route', 'foo:bar');
+        $this->request->attributes->set('_route', 'foo:bar');
 
-        $this->controller->delete($this->symfonyRequest, 3);
+        $this->controller->delete($this->request, 3);
     }
 }
 

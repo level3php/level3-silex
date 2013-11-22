@@ -22,6 +22,8 @@ use Level3\Processor\Wrapper\Logger;
 use Level3\Processor\Wrapper\RateLimiter;
 use Level3\Processor\Wrapper\Authenticator;
 use Level3\Processor\Wrapper\BasicIpFirewall;
+use Level3\Resource\Formatter\Siren;
+use Level3\Resource\Formatter\HAL;
 use Level3\Exceptions\HTTPException;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -168,6 +170,10 @@ class ServiceProvider implements ServiceProviderInterface {
 
             $level3->addProcessorWrapper($app['level3.wrapper.exception_handler']);
 
+            $level3->addFormatter(new HAL\JsonFormatter());
+            $level3->addFormatter(new HAL\XMLFormatter());
+            $level3->addFormatter(new Siren\JsonFormatter());
+            
             return $level3;
         });
 

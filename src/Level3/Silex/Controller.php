@@ -61,7 +61,8 @@ class Controller
 
     public function error(Request $request, Exception $exception)
     {
-        $response = $this->getProcessor()->error($request, $exception);
+        $repositoryKey = $this->getResourceKey($request);
+        $response = $this->getProcessor()->error($repositoryKey, $request, $exception);
 
         return $response;
     }
