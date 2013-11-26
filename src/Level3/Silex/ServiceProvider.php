@@ -24,6 +24,7 @@ use Level3\Processor\Wrapper\Authenticator;
 use Level3\Processor\Wrapper\BasicIpFirewall;
 use Level3\Resource\Format\Writer\Siren;
 use Level3\Resource\Format\Writer\HAL;
+use Level3\Helper\IndexRepository;
 use Level3\Exceptions\HTTPException;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -42,8 +43,17 @@ class ServiceProvider implements ServiceProviderInterface {
             return $mapper;
         });
 
+        $app['level3.repository.index'] = $app->share(function(Level3 $level3) {
+            return new IndexRepository($level3);
+        });
+
         $app['level3.hub']  = $app->share(function(Application $app) {
-            return new Hub();
+            $hub = new Hub();
+            if ($indexRepository = $app->raw('level3.repository.index')) {
+                $hub->registerIndexDefinition($indexRepository);
+            }
+
+            return $hub;
         });
 
         $app['level3.processor']  = $app->share(function(Application $app) {
