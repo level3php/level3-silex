@@ -12,6 +12,8 @@ namespace Level3\Silex;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Silex\Application;
+use Silex\Api\BootableProviderInterface;
 use Level3\Level3;
 use Level3\Hub;
 use Level3\Processor;
@@ -25,13 +27,11 @@ use Level3\Resource\Format\Writer\Siren;
 use Level3\Resource\Format\Writer\HAL;
 use Level3\Helper\IndexRepository;
 use Level3\Exceptions\HTTPException;
-use Symfony\Component\HttpFoundation\Request;
-
-
-
+use Level3\Messages\Request;
 use Exception;
 
-class ServiceProvider implements ServiceProviderInterface {
+class ServiceProvider implements ServiceProviderInterface, BootableProviderInterface
+{
 
     public function register(Container $app) {
         $app['level3.mapper'] = function(Container $app) {
@@ -209,17 +209,17 @@ class ServiceProvider implements ServiceProviderInterface {
         $app['level3.cors.allow_headers'] = null;
     }
 
-    public function boot(Container $app) {
+    public function boot(Application $app) {
         $app['level3']->boot();
 
-        $app->error(function (Exception $exception, $code) use ($app) {
+        $app->error(function (Exception $exception, Request $request, $code) use ($app) {
             if ($code != 0) {
                 $exception = new HTTPException(
                     $exception->getMessage(), $code, $exception
                 );
             }
 
-            return $app['level3.controller']->error($app['request'], $exception);
+            return $app['level3.controller']->error($request, $exception);
         });
     }
 }
