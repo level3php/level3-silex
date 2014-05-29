@@ -45,7 +45,7 @@ class ServiceProviderTest extends TestCase {
         $app = $this->getAppWithLevel3ServiceProvider();
         $app['level3.base_uri'] = 'foo';
 
-        $this->assertSame('foo/', $app['level3.mapper']->getBaseURI());
+        $this->assertSame('foo', $app['level3.mapper']->getBaseURI());
     }
 
     public function testRegisterController()

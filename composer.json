@@ -12,11 +12,11 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
-        "level3/level3": "*"
+        "level3/level3": "dev-master",
+        "silex/silex": "2.0.*@dev"
     },
     "require-dev": {
-        "mockery/mockery": "*",
-        "silex/silex": "1.0.*@dev"
+        "mockery/mockery": "*"
     },
     "autoload": {
         "psr-0": {

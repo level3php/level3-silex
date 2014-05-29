@@ -10,9 +10,8 @@
 
 namespace Level3\Silex;
 
-use Silex\ServiceProviderInterface;
-use Silex\Application;
-
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
 use Level3\Level3;
 use Level3\Hub;
 use Level3\Processor;
@@ -26,7 +25,6 @@ use Level3\Resource\Format\Writer\Siren;
 use Level3\Resource\Format\Writer\HAL;
 use Level3\Helper\IndexRepository;
 use Level3\Exceptions\HTTPException;
-
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -35,46 +33,46 @@ use Exception;
 
 class ServiceProvider implements ServiceProviderInterface {
 
-    public function register(Application $app) {
-        $app['level3.mapper']  = $app->share(function(Application $app) {
+    public function register(Container $app) {
+        $app['level3.mapper'] = function(Container $app) {
             $mapper = new Mapper($app);
             $mapper->setBaseURI($app['level3.base_uri']);
             
             return $mapper;
-        });
+        };
 
-        $app['level3.repository.index'] = $app->share(function(Level3 $level3) {
+        $app['level3.repository.index'] = function(Level3 $level3) {
             return new IndexRepository($level3);
-        });
+        };
 
-        $app['level3.hub']  = $app->share(function(Application $app) {
+        $app['level3.hub'] = function(Container $app) {
             $hub = new Hub();
             if ($indexRepository = $app->raw('level3.repository.index')) {
                 $hub->registerIndexDefinition($indexRepository);
             }
 
             return $hub;
-        });
+        };
 
-        $app['level3.processor']  = $app->share(function(Application $app) {
+        $app['level3.processor'] = function(Container $app) {
             return new Processor();
-        });
+        };
 
-        $app['level3.controller'] = $app->share(function(Application $app) {
+        $app['level3.controller'] = function(Container $app) {
             return new Controller(
                 $app['level3']
             );
-        });
+        };
 
-        $app['level3.wrapper.exception_handler'] = $app->share(function(Application $app) {
+        $app['level3.wrapper.exception_handler'] = function(Container $app) {
             return new ExceptionHandler();
-        });
+        };
 
-        $app['level3.wrapper.authenticator'] = $app->share(function(Application $app) {
+        $app['level3.wrapper.authenticator'] = function(Container $app) {
             return new Authenticator();
-        });
+        };
 
-        $app['level3.wrapper.basic_ip_firewall'] = $app->share(function(Application $app) {
+        $app['level3.wrapper.basic_ip_firewall'] = function(Container $app) {
             $firewall = new BasicIpFirewall();
 
             if (strlen($app['level3.firewall.blacklist']) != 0) {
@@ -90,9 +88,9 @@ class ServiceProvider implements ServiceProviderInterface {
             }
 
             return $firewall;
-        });
+        };
 
-        $app['level3.wrapper.cors'] = $app->share(function(Application $app) {
+        $app['level3.wrapper.cors'] = function(Container $app) {
             $cors = new CrossOriginResourceSharing();
             
             if ($origins = explode(',', $app['level3.cors.allowed_origins'])) {
@@ -125,9 +123,9 @@ class ServiceProvider implements ServiceProviderInterface {
 
 
             return $cors;
-        });
+        };
 
-        $app['level3.wrapper.limiter'] = $app->share(function(Application $app) {
+        $app['level3.wrapper.limiter'] = function(Container $app) {
             if (!$app['level3.redis']) {
                 return null;
             }
@@ -143,15 +141,15 @@ class ServiceProvider implements ServiceProviderInterface {
             }
 
             return $limiter;
-        });
+        };
 
-        $app['level3.wrapper.logger'] = $app->share(function(Application $app) {
+        $app['level3.wrapper.logger'] = function(Container $app) {
             if ($app['level3.logger']) {
                 return new Logger($app['level3.logger']);
             }
-        });
+        };
 
-        $app['level3']  = $app->share(function(Application $app) {
+        $app['level3'] = function(Container $app) {
             $level3 = new Level3(
                 $app['level3.mapper'],
                 $app['level3.hub'],
@@ -185,7 +183,7 @@ class ServiceProvider implements ServiceProviderInterface {
             $level3->addFormatWriter(new Siren\JsonWriter());
             
             return $level3;
-        });
+        };
 
         $app['level3.enable.limiter'] = false;
         $app['level3.enable.cors'] = false;
@@ -211,7 +209,7 @@ class ServiceProvider implements ServiceProviderInterface {
         $app['level3.cors.allow_headers'] = null;
     }
 
-    public function boot(Application $app) {
+    public function boot(Container $app) {
         $app['level3']->boot();
 
         $app->error(function (Exception $exception, $code) use ($app) {
